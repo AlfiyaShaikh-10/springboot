@@ -3,42 +3,40 @@ package com.example.test.demo.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.test.demo.entity.EmployeeEntity;
 import com.example.test.demo.model.Employee;
+import com.example.test.demo.repository.EmployeeRepository;
 
 @Service
 public class EmployeeService {
 
-    private List<Employee> employees = new ArrayList<>();
+    @Autowired
+    private EmployeeRepository employeeRepository;
+    // private List<Employee> employees = new ArrayList<>();
 
     public EmployeeService() {
-        System.out.println("EmployeeService bean created ✅");
     }
 
-    public List<Employee> getAllEmployees() {
-        return employees;
+    public List<EmployeeEntity> getAllEmployees() {
+        return employeeRepository.findAll();
     }
 
-    public void addEmployee(Employee employee) {
-        employees.add(employee);
-        System.out.println("Added: " + employee.getName() + ", Total employees: " + employees.size());
+    public void addEmployee(EmployeeEntity employee) {
+        employeeRepository.save(employee);
     }
 
-    public boolean updateEmployee(long id, Employee updatedVal) {
-        for (Employee e : employees) {
-            if (e.getId().equals(id)) {
-                e.setName(updatedVal.getName());
-                e.setEmail(updatedVal.getEmail());
-                System.out.println("updated" + e.toString());
-            }
-            return true;
-        }
-        return false;
+    public EmployeeEntity updateEmployee(long id, Employee updatedVal) {
+        EmployeeEntity existing = employeeRepository.findById(id).orElseThrow();
+        existing.setName(updatedVal.getName());
+        existing.setEmail(updatedVal.getEmail());
+        return employeeRepository.save(existing);
     }
 
-    public boolean deleteEmloyee(long id) {
-        return employees.removeIf(e -> e.getId().equals(id));
+    public void deleteEmloyee(long id) {
+        employeeRepository.deleteById(id);
     }
 
 }
